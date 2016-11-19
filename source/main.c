@@ -1,45 +1,40 @@
+#ifndef HEADER
+#define HEADER
 #include <stdio.h>
 #include <3ds.h>
 #include <string.h>
+#include <pestmenu/service.h>
+#endif
 
-Handle *signalEvent = NULL;
-Handle *resumeEvent = NULL;
+Handle aptEvents[3];
+LightEvent aptSleepEvent;
 
 Handle *nssHandle = NULL;
+Handle *ptmsysmHandle = NULL;
+Handle *psHandle = NULL;
+Handle *amHandle = NULL;
+Handle *cfgHandle = NULL;
+Handle aptLockHandle;
 
-aptMessageCb callback = {NULL, APPID_HOMEMENU, "boop", sizeof("boop")};
-
-void clearCmdBuf() {
-  memset(getThreadCommandBuffer(), 0, sizeof(getThreadCommandBuffer()));
-}
+u32 gspProcess;
 
 void __appInit() {
-  srvInit();
-  hidInit();
-
-  fsInit();
-  sdmcInit();
-
-  gfxInitDefault();
-  consoleInit(GFX_TOP, NULL);
+  startServices();
 }
 
 int main(int argc, char **argv) {
 
     printf("PestMenu v0.0.1\n");
-    srvGetServiceHandle(nssHandle, "ns:s");
-    printf("APT_Initialize: %08X\n", APT_Initialize(APPID_HOMEMENU, aptMakeAppletAttr(APTPOS_SYS, true, true), signalEvent, resumeEvent));
 
     while (aptMainLoop()) {
       hidScanInput();
 
       if (hidKeysDown() & KEY_A) {
-
-        FS_ProgramInfo inf = {0x000400000FF40002, MEDIATYPE_NAND};
+        //FS_ProgramInfo inf = {0x000400000FF40002, MEDIATYPE_NAND};
         u32 prep_start_app_cmdbuf[16];
         prep_start_app_cmdbuf[0] = IPC_MakeHeader(0x15,5,0); // 0x150140; APT_PrepareToStartApplication
-        prep_start_app_cmdbuf[1] = 0x0FF40002;
-        prep_start_app_cmdbuf[2] = 0x00040000;
+        prep_start_app_cmdbuf[1] = 0x00040000;
+        prep_start_app_cmdbuf[2] = 0x0FF40002;
         prep_start_app_cmdbuf[3] = MEDIATYPE_NAND;
         prep_start_app_cmdbuf[4] = 0x00000000;
         prep_start_app_cmdbuf[5] = 0;
