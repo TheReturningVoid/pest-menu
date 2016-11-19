@@ -1,0 +1,6 @@
+#!/bin/bash
+rm -f Boot_Test.elf
+rm -f PestMenu.cia
+make
+arm-none-eabi-strip --strip-all PestMenu.elf
+makerom -f cia -o PestMenu.cia -rsf res/pestmenu.rsf -target t -exefslogo -elf PestMenu.elf -icon res/icon.icn -banner res/banner.bnr
